@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@master
@@ -22,15 +22,13 @@ jobs:
         node-version: '14.x'
 
     - name: npm install, build, and test
+      working-directory: ./server
       run: |
         npm install
-        npm run build --if-present
-        npm run test --if-present
 
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'coderdojo-monsters-server'
-        slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_2553df164ab040a588971205fbc7f029 }}
-        package: .
+        package: ./server
