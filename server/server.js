@@ -7,11 +7,13 @@ var io = require('socket.io')(server, {
     cors: true
 });
 
+const port = process.env.PORT || 3000;
+
 app.use(cors());
 
 app.use(express.static('assets', { maxAge: '3600000' }));
 
-server.listen(8081, function () { // Listens to port 8081
+server.listen(port, function () { // Listens to port 8081
     console.log('Listening on ' + server.address().port);
 });
 
