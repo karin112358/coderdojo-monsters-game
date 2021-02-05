@@ -1,0 +1,23 @@
+body {
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+    width: 800px;
+  }
+  
+  button,
+  input {
+    font-size: inherit;
+    padding: 10px 20px;
+    border: 2px solid #a13a08;
+    border-radius: 10px;
+    font-weight: bold;
+    margin-top: 200px;
+  }
+  
+  button {
+    background-color: #ce5419;
+    color: #fff;
+    margin-top: 300px;
+  }
+  

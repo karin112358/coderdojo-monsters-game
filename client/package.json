@@ -1,0 +1,13 @@
+{
+  "name": "typescript",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@types/events": "^3.0.0",
+    "@types/p5": "0.9.1",
+    "@types/socket.io-client": "^1.4.35",
+    "events": "^3.2.0",
+    "p5": "1.2.0",
+    "socket.io-client": "^3.1.0"
+  }
+}
