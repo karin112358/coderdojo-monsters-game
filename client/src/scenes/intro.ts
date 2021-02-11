@@ -2,10 +2,19 @@ import { Scene } from "./scene";
 import p5 from "p5";
 
 export class Intro extends Scene {
-  public selectedMonster = 0;
+  selectedMonster = 0;
+  background: p5.Image;
+
+  async loadResources(p: p5) {
+    this.background = await this.loadImage(p, "background-pale.png");
+  }
+
+  setup(p: p5) {
+    p.createCanvas(800, 800);
+  }
 
   draw(p: p5) {
-    p.image(this.game.background, 0, 0, 1600, 800);
+    p.image(this.background, 0, 0, 1600, 800);
 
     // selected monster
     p.fill("#ffac38");

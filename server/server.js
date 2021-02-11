@@ -7,6 +7,8 @@ var io = require('socket.io')(server, {
     cors: true
 });
 
+const configuration = { width: 1200, height: 1000 };
+
 const port = process.env.PORT || 3000;
 
 app.use(cors());
@@ -21,7 +23,23 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/config.json', function (req, res) {
+    res.send(configuration);
+});
+
 let players = [];
+let stars = [];
+
+// generate stars
+if (!players.length) {
+    for (let i = 0; i < 200; i++) {
+        stars.push({
+            x: Math.floor(Math.random() * configuration.width),
+            y: Math.floor(Math.random() * configuration.height),
+            size: Math.floor(Math.random() * 10 + 10)
+        });
+    }
+}
 
 io.on('connection', function (socket) {
     console.log('new connection');
@@ -34,12 +52,15 @@ io.on('connection', function (socket) {
                     console.log('new player', name);
                     player = {
                         name: name,
-                        monsterId: monsterId
+                        monsterId: monsterId,
+                        x: Math.floor(Math.random() * configuration.width),
+                        y: Math.floor(Math.random() * configuration.height),
+                        size: 100
                     };
 
                     players.push(player);
 
-                    socket.emit('joinedGame', players);
+                    socket.emit('joinedGame', { self: player, otherPlayers: players.filter(p => p.name !== name), stars: stars });
                     socket.broadcast.emit('playerJoinedGame', player);
                 } else {
                     socket.emit('error', 'Please enter a name.');
@@ -49,6 +70,14 @@ io.on('connection', function (socket) {
             }
         } else {
             socket.emit('error', 'You have already joined the game.');
+        }
+    });
+
+    socket.on('updatePosition', function (position) {
+        if (player) {
+            player.x = position.x;
+            player.y = position.y;
+            socket.broadcast.emit('playerUpdatedPosition', player);
         }
     });
 
