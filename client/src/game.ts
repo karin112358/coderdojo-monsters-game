@@ -9,7 +9,6 @@ import { Star } from "./star";
 import { Configuration } from "./configuration";
 
 export class Game {
-  background: p5.Image;
   monsters: p5.Image[] = [];
   activeScene: Scene;
   players: Player[];
@@ -72,8 +71,6 @@ export class Game {
   }
 
   loadResources(p: p5) {
-    this.background = p.loadImage(this.server + "background.png");
-
     for (let i = 1; i <= 40; i++) {
       this.monsters.push(
         p.loadImage(this.server + "monsters/" + i.toString() + ".png")

@@ -7,7 +7,7 @@ var io = require('socket.io')(server, {
     cors: true
 });
 
-const configuration = { width: 1200, height: 1000 };
+const configuration = { width: 800, height: 800 };
 
 const port = process.env.PORT || 3000;
 
