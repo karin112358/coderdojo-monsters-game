@@ -3,5 +3,8 @@ export interface Player {
   monsterId: number;
   x: number;
   y: number;
+  speedX: number;
+  speedY: number;
   size: number;
+  energy: number;
 }

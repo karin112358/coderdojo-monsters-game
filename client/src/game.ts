@@ -56,6 +56,8 @@ export class Game {
         if (updatedPlayer) {
           updatedPlayer.x = player.x;
           updatedPlayer.y = player.y;
+          updatedPlayer.speedX = player.speedX;
+          updatedPlayer.speedY = player.speedY;
         }
       }
     });
@@ -104,7 +106,7 @@ export class Game {
   }
 
   updatePosition() {
-    this.socket.emit("updatePosition", { x: this.self.x, y: this.self.y });
+    this.socket.emit("updatePosition", { x: this.self.x, y: this.self.y, speedX: this.self.speedX, speedY: this.self.speedY });
   }
 
   private async changeScene(scene: Scene) {

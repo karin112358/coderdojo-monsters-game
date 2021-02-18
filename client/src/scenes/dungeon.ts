@@ -26,46 +26,61 @@ export class Dungeon extends Scene {
     // stars
     this.drawStars(p);
 
-    // monsters
+    // other monsters
     p.noStroke();
     p.textSize(20);
     for (let player of this.game.players) {
+      player.x = Math.min(Math.max(0, player.x + player.speedX), this.game.configuration.width);
+      player.y = Math.min(Math.max(0, player.y + player.speedY), this.game.configuration.height);
       this.drawPlayer(p, player);
+    }
+
+    // self monster
+    let speed = 2;
+    if (p.keyIsPressed && p.key == 's' && this.game.self.energy > 0) {
+      this.game.self.energy--;
+      speed = 4;
+    } else if ((!p.keyIsPressed || p.key != 's') && this.game.self.energy < 100) {
+      this.game.self.energy += 0.5;
+    }
+
+    let speedX = 0;
+    let speedY = 0;
+
+    if (p.mouseX > this.game.self.x - this.offset.x + 10) {
+      speedX = speed;
+    } else if (p.mouseX < this.game.self.x - this.offset.x - 10) {
+      speedX = speed * -1;
+    }
+
+    if (p.mouseY > this.game.self.y - this.offset.y + 10) {
+      speedY = speed;
+    } else if (p.mouseY < this.game.self.y - this.offset.y - 10) {
+      speedY = speed * -1;
+    }
+
+    this.game.self.x = Math.min(Math.max(0, this.game.self.x + speedX), this.game.configuration.width);
+    this.game.self.y = Math.min(Math.max(0, this.game.self.y + speedY), this.game.configuration.height);
+
+    if (this.game.self.speedX != speedX || this.game.self.speedY != speedY || p.frameCount % 60 == 0) {
+      this.game.self.speedX = speedX;
+      this.game.self.speedY = speedY;
+      this.game.updatePosition();
     }
 
     this.drawPlayer(p, this.game.self);
 
-    // move monster
-    let speed = 2;
-    let x = this.game.self.x;
-    let y = this.game.self.y;
-
-    if (p.mouseX > this.game.self.x - this.offset.x + 10) {
-      x = this.game.self.x + speed;
-    } else if (p.mouseX < this.game.self.x - this.offset.x - 10) {
-      x = this.game.self.x - speed;
-    }
-
-    if (p.mouseY > this.game.self.y - this.offset.y + 10) {
-      y = this.game.self.y + speed;
-    } else if (p.mouseY < this.game.self.y - this.offset.y - 10) {
-      y = this.game.self.y - speed;
-    }
-
-    this.game.self.x = Math.min(Math.max(0, x), this.game.configuration.width);
-    this.game.self.y = Math.min(Math.max(0, y), this.game.configuration.height);
-
-    this.game.updatePosition();
+    this.drawEnergy(p);
   }
 
   mouseClicked(p: p5) { }
 
   private drawBackground(p: p5) {
     p.image(
-      this.background, 
-      0 - this.offset.x, 
-      0 - this.offset.y, 
-      this.game.configuration.width, 
+      this.background,
+      0 - this.offset.x,
+      0 - this.offset.y,
+      this.game.configuration.width,
       this.game.configuration.height);
   }
 
@@ -94,5 +109,12 @@ export class Dungeon extends Scene {
         star.size
       );
     }
+  }
+
+  private drawEnergy(p: p5)  {
+    // show energy
+    p.textAlign(p.LEFT, p.TOP);
+    p.textSize(16);
+    p.text("Energy: " + this.game.self.energy.toString(), 10, 10);
   }
 }

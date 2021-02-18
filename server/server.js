@@ -7,7 +7,7 @@ var io = require('socket.io')(server, {
     cors: true
 });
 
-const configuration = { width: 800, height: 800 };
+const configuration = { width: 1200, height: 1200 };
 
 const port = process.env.PORT || 3000;
 
@@ -55,7 +55,10 @@ io.on('connection', function (socket) {
                         monsterId: monsterId,
                         x: Math.floor(Math.random() * configuration.width),
                         y: Math.floor(Math.random() * configuration.height),
-                        size: 100
+                        speedX: 0,
+                        speedY: 0,
+                        size: 100,
+                        energy: 100
                     };
 
                     players.push(player);
@@ -77,6 +80,8 @@ io.on('connection', function (socket) {
         if (player) {
             player.x = position.x;
             player.y = position.y;
+            player.speedX = position.speedX;
+            player.speedY = position.speedY;
             socket.broadcast.emit('playerUpdatedPosition', player);
         }
     });

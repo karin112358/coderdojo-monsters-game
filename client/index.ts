@@ -6,8 +6,8 @@ import { Game } from "./src/game";
 let game: Game;
 
 function preload(p: p5) {
-    game = new Game("https://coderdojo-monsters-server.azurewebsites.net/");
-    //game = new Game("http://127.0.0.1:3000/");
+    //game = new Game("https://coderdojo-monsters-server.azurewebsites.net/");
+    game = new Game("http://127.0.0.1:3000/");
     game.loadResources(p);
 }
 
