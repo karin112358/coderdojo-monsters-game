@@ -38,10 +38,10 @@ export class Dungeon extends Scene {
     // self monster
     let speed = 2;
     if (p.keyIsPressed && p.key == 's' && this.game.self.energy > 0) {
-      this.game.self.energy--;
+      this.game.self.energy = Math.max(0, this.game.self.energy - 1);
       speed = 4;
     } else if ((!p.keyIsPressed || p.key != 's') && this.game.self.energy < 100) {
-      this.game.self.energy += 0.5;
+      this.game.self.energy = Math.min(100, this.game.self.energy + 0.25)
     }
 
     let speedX = 0;
@@ -71,6 +71,7 @@ export class Dungeon extends Scene {
     this.drawPlayer(p, this.game.self);
 
     this.drawEnergy(p);
+    this.drawRanking(p);
   }
 
   mouseClicked(p: p5) { }
@@ -115,6 +116,22 @@ export class Dungeon extends Scene {
     // show energy
     p.textAlign(p.LEFT, p.TOP);
     p.textSize(16);
-    p.text("Energy: " + this.game.self.energy.toString(), 10, 10);
+    p.text("Energy: " + Math.floor(this.game.self.energy).toString(), 10, 10);
+  }
+
+  private drawRanking(p: p5) {
+    const ranking: Player[] = [];
+    ranking.push(this.game.self);
+    ranking.push(...this.game.players);
+
+    let top = 10;
+
+    p.textAlign(p.RIGHT, p.TOP);
+    ranking
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .forEach(r => {
+        p.text(r.name, p.width - 10, top);
+        top += 20;
+      });
   }
 }
