@@ -41,9 +41,40 @@ if (!players.length) {
     }
 }
 
+setInterval(() => {
+    if (stars.length < 200) {
+        for (let i = 0; i < 200 - stars.length; i++) {
+            stars.push({
+                x: Math.floor(Math.random() * configuration.width),
+                y: Math.floor(Math.random() * configuration.height),
+                size: Math.floor(Math.random() * 10 + 10)
+            });
+        }
+    }
+
+    for (let player of players) {
+        if (player.size > 50) {
+            player.size -= 0.4;
+        }
+    }
+}, 200);
+
 io.on('connection', function (socket) {
     console.log('new connection');
     let player = null;
+
+    let starsUpdateInterval = setInterval(() => {
+        if (player) {
+            socket.emit('starsUpdated', stars);
+        }
+    }, 500);
+
+    let playerUpdateInterval = setInterval(() => {
+        if (player) {
+            socket.emit('updatedSize', player.size);
+            socket.broadcast.emit('playerUpdatedSize', player);
+        }
+    }, 500);
 
     socket.on('joinGame', function (name, monsterId) {
         if (!player) {
@@ -86,8 +117,21 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('eatStar', function (x, y) {
+        const index = stars.findIndex(s => s.x === x && s.y === y);
+        if (index >= 0) {
+            player.size += stars[index].size / 10;
+            stars.splice(index, 1);
+            socket.emit('updatedSize', player.size);
+            socket.broadcast.emit('playerUpdatedSize', player);
+        }
+    });
+
     socket.on('disconnect', function () {
         console.log('disconnected', player ? player.name : 'new player');
+
+        clearInterval(starsUpdateInterval);
+        clearInterval(playerUpdateInterval);
 
         if (player && player.name) {
             const index = players.findIndex(p => p.name === player.name);

@@ -99,20 +99,26 @@ export class Dungeon extends Scene {
   }
 
   private drawStars(p: p5) {
-    let size = 20;
+    for (let i = this.game.stars.length - 1; i >= 0; i--) {
+      const star = this.game.stars[i];
+      const dist = Math.sqrt(Math.pow(star.x - this.game.self.x, 2) + Math.pow(star.y - this.game.self.y, 2));
 
-    for (let star of this.game.stars) {
-      p.image(
-        this.star,
-        star.x - size / 2 - this.offset.x,
-        star.y - size / 2 - this.offset.y,
-        star.size,
-        star.size
-      );
+      if (dist < this.game.self.size / 4) {
+        this.game.eatStar(star.x, star.y);
+        this.game.stars.splice(i, 1);
+      } else {
+        p.image(
+          this.star,
+          star.x - star.size / 2 - this.offset.x,
+          star.y - star.size / 2 - this.offset.y,
+          star.size,
+          star.size
+        );
+      }
     }
   }
 
-  private drawEnergy(p: p5)  {
+  private drawEnergy(p: p5) {
     // show energy
     p.textAlign(p.LEFT, p.TOP);
     p.textSize(16);
@@ -128,9 +134,9 @@ export class Dungeon extends Scene {
 
     p.textAlign(p.RIGHT, p.TOP);
     ranking
-      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .sort((a, b) => (a.size < b.size ? 1 : -1))
       .forEach(r => {
-        p.text(r.name, p.width - 10, top);
+        p.text(r.name + "   " + Math.floor(r.size), p.width - 10, top);
         top += 20;
       });
   }

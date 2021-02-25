@@ -62,6 +62,25 @@ export class Game {
       }
     });
 
+    this.socket.on("playerUpdatedSize", (player: Player) => {
+      if (this.players) {
+        const updatedPlayer = this.players.find(p => p.name === player.name);
+        if (updatedPlayer) {
+          updatedPlayer.size = player.size;
+        }
+      }
+    });
+
+    this.socket.on("updatedSize", (size: number) => {
+      if (this.players) {
+        this.self.size = size;
+      }
+    });
+
+    this.socket.on("starsUpdated", (stars: Star[]) => {
+      this.stars = stars;
+    });
+
     this.socket.on("playerLeftGame", (player: any) => {
       if (this.players) {
         const index = this.players.findIndex(p => p.name === player.name);
@@ -107,6 +126,10 @@ export class Game {
 
   updatePosition() {
     this.socket.emit("updatePosition", { x: this.self.x, y: this.self.y, speedX: this.self.speedX, speedY: this.self.speedY });
+  }
+
+  eatStar(x: number, y: number) {
+    this.socket.emit("eatStar", x, y);
   }
 
   private async changeScene(scene: Scene) {
