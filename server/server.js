@@ -41,40 +41,40 @@ if (!players.length) {
     }
 }
 
-setInterval(() => {
-    if (stars.length < 200) {
-        for (let i = 0; i < 200 - stars.length; i++) {
-            stars.push({
-                x: Math.floor(Math.random() * configuration.width),
-                y: Math.floor(Math.random() * configuration.height),
-                size: Math.floor(Math.random() * 10 + 10)
-            });
-        }
-    }
+// setInterval(() => {
+//     if (stars.length < 200) {
+//         for (let i = 0; i < 200 - stars.length; i++) {
+//             stars.push({
+//                 x: Math.floor(Math.random() * configuration.width),
+//                 y: Math.floor(Math.random() * configuration.height),
+//                 size: Math.floor(Math.random() * 10 + 10)
+//             });
+//         }
+//     }
 
-    for (let player of players) {
-        if (player.size > 50) {
-            player.size -= 0.4;
-        }
-    }
-}, 200);
+//     for (let player of players) {
+//         if (player.size > 50) {
+//             player.size -= 0.4;
+//         }
+//     }
+// }, 200);
 
 io.on('connection', function (socket) {
     console.log('new connection');
     let player = null;
 
-    let starsUpdateInterval = setInterval(() => {
-        if (player) {
-            socket.emit('starsUpdated', stars);
-        }
-    }, 500);
+    // let starsUpdateInterval = setInterval(() => {
+    //     if (player) {
+    //         socket.emit('starsUpdated', stars);
+    //     }
+    // }, 500);
 
-    let playerUpdateInterval = setInterval(() => {
-        if (player) {
-            socket.emit('updatedSize', player.size);
-            socket.broadcast.emit('playerUpdatedSize', player);
-        }
-    }, 500);
+    // let playerUpdateInterval = setInterval(() => {
+    //     if (player) {
+    //         socket.emit('updatedSize', player.size);
+    //         socket.broadcast.emit('playerUpdatedSize', player);
+    //     }
+    // }, 500);
 
     socket.on('joinGame', function (name, monsterId) {
         if (!player) {
@@ -109,16 +109,21 @@ io.on('connection', function (socket) {
 
     socket.on('updatePosition', function (position) {
         if (player) {
-            // if (position.speedX > 4 || position.speedY > 4) {
-            //     socket.emit('error', 'You are cheating!');
-            //     socket.disconnect();
-            // } else {
+            if (position.speedX > 4 || position.speedY > 4) {
+                socket.emit('error', 'You are cheating!');
+                socket.disconnect();
+            } else {
                 player.x = position.x;
                 player.y = position.y;
                 player.speedX = position.speedX;
                 player.speedY = position.speedY;
                 socket.broadcast.emit('playerUpdatedPosition', player);
-            //}
+
+                updateStatus();
+                socket.emit('starsUpdated', stars);
+                socket.emit('updatedSize', player.size);
+                socket.broadcast.emit('playerUpdatedSize', player);
+            }
         }
     });
 
@@ -135,8 +140,8 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log('disconnected', player ? player.name : 'new player');
 
-        clearInterval(starsUpdateInterval);
-        clearInterval(playerUpdateInterval);
+        // clearInterval(starsUpdateInterval);
+        // clearInterval(playerUpdateInterval);
 
         if (player && player.name) {
             const index = players.findIndex(p => p.name === player.name);
@@ -146,4 +151,22 @@ io.on('connection', function (socket) {
             }
         }
     });
+
+    function updateStatus() {
+        if (stars.length < 200) {
+            for (let i = 0; i < 200 - stars.length; i++) {
+                stars.push({
+                    x: Math.floor(Math.random() * configuration.width),
+                    y: Math.floor(Math.random() * configuration.height),
+                    size: Math.floor(Math.random() * 10 + 10)
+                });
+            }
+        }
+
+        for (let player of players) {
+            if (player.size > 50) {
+                player.size -= 0.4;
+            }
+        }
+    }
 });
