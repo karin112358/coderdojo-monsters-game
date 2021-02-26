@@ -109,16 +109,16 @@ io.on('connection', function (socket) {
 
     socket.on('updatePosition', function (position) {
         if (player) {
-            if (position.speedX > 4 || position.speedY > 4) {
-                socket.emit('error', 'You are cheating!');
-                socket.disconnect();
-            } else {
+            // if (position.speedX > 4 || position.speedY > 4) {
+            //     socket.emit('error', 'You are cheating!');
+            //     socket.disconnect();
+            // } else {
                 player.x = position.x;
                 player.y = position.y;
                 player.speedX = position.speedX;
                 player.speedY = position.speedY;
                 socket.broadcast.emit('playerUpdatedPosition', player);
-            }
+            //}
         }
     });
 
