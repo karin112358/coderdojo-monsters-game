@@ -130,7 +130,7 @@ io.on('connection', function (socket) {
 
     socket.on('eatStar', function (x, y) {
         const index = stars.findIndex(s => s.x === x && s.y === y);
-        if (index >= 0) {
+        if (index >= 0 && player.size < 500) {
             player.size += stars[index].size / 10;
             stars.splice(index, 1);
             socket.emit('updatedSize', player.size);
