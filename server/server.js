@@ -29,6 +29,7 @@ app.get('/config.json', function (req, res) {
 
 let players = [];
 let stars = [];
+let lastUpdated = Math.floor((new Date()) / 1000);
 
 // generate stars
 if (!players.length) {
@@ -163,10 +164,12 @@ io.on('connection', function (socket) {
             }
         }
 
+        let newUpdated = Math.floor((new Date()) / 1000);
         for (let player of players) {
             if (player.size > 50) {
-                player.size -= 0.4;
+                player.size -= (newUpdated - lastUpdated);
             }
         }
+        lastUpdated = newUpdated;
     }
 });
