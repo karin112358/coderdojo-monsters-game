@@ -36,7 +36,7 @@ if (!players.length) {
         stars.push({
             x: Math.floor(Math.random() * configuration.width),
             y: Math.floor(Math.random() * configuration.height),
-            size: Math.floor(Math.random() * 10 + 10)
+            size: Math.floor(Math.random() * 15 + 10)
         });
     }
 }
@@ -158,7 +158,7 @@ io.on('connection', function (socket) {
                 stars.push({
                     x: Math.floor(Math.random() * configuration.width),
                     y: Math.floor(Math.random() * configuration.height),
-                    size: Math.floor(Math.random() * 10 + 10)
+                    size: Math.floor(Math.random() * 15 + 10)
                 });
             }
         }
