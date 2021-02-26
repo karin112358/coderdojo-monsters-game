@@ -167,7 +167,7 @@ io.on('connection', function (socket) {
         let newUpdated = Math.floor((new Date()) / 1000);
         for (let player of players) {
             if (player.size > 50) {
-                player.size -= (newUpdated - lastUpdated);
+                player.size -= (newUpdated - lastUpdated) * (player.size / 100);
             }
         }
         lastUpdated = newUpdated;
