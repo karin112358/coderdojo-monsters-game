@@ -15,7 +15,7 @@ app.use(cors());
 
 app.use(express.static('assets', { maxAge: '3600000' }));
 
-server.listen(port, function () { // Listens to port 8081
+server.listen(port, function () {
     console.log('Listening on ' + server.address().port);
 });
 
@@ -42,46 +42,14 @@ if (!players.length) {
     }
 }
 
-// setInterval(() => {
-//     if (stars.length < 200) {
-//         for (let i = 0; i < 200 - stars.length; i++) {
-//             stars.push({
-//                 x: Math.floor(Math.random() * configuration.width),
-//                 y: Math.floor(Math.random() * configuration.height),
-//                 size: Math.floor(Math.random() * 10 + 10)
-//             });
-//         }
-//     }
-
-//     for (let player of players) {
-//         if (player.size > 50) {
-//             player.size -= 0.4;
-//         }
-//     }
-// }, 200);
-
 io.on('connection', function (socket) {
     console.log('new connection');
     let player = null;
-
-    // let starsUpdateInterval = setInterval(() => {
-    //     if (player) {
-    //         socket.emit('starsUpdated', stars);
-    //     }
-    // }, 500);
-
-    // let playerUpdateInterval = setInterval(() => {
-    //     if (player) {
-    //         socket.emit('updatedSize', player.size);
-    //         socket.broadcast.emit('playerUpdatedSize', player);
-    //     }
-    // }, 500);
 
     socket.on('joinGame', function (name, monsterId) {
         if (!player) {
             if (!players.find(p => p.name === name)) {
                 if (name) {
-                    console.log('new player', name);
                     player = {
                         name: name,
                         monsterId: monsterId,
@@ -92,6 +60,10 @@ io.on('connection', function (socket) {
                         size: 100,
                         energy: 100
                     };
+
+                    console.log('new player', name);
+
+                    updateStatus();
 
                     players.push(player);
 
@@ -125,6 +97,8 @@ io.on('connection', function (socket) {
                 socket.emit('updatedSize', player.size);
                 socket.broadcast.emit('playerUpdatedSize', player);
             }
+        } else {
+            socket.emit('error', 'Player not valid')
         }
     });
 
@@ -138,11 +112,29 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('eatPlayer', function (name) {
+        if (player) {
+            const playerToEat = players.find(s => s.name === name);
+            if (playerToEat && playerToEat.size < player.size) {
+                const dist = Math.sqrt(Math.pow(player.x - playerToEat.x, 2) + Math.pow(player.y - playerToEat.y, 2));
+                console.log(playerToEat, dist);
+
+                if (dist < player.size / 4) {
+                    console.log('eat');
+                    const index = players.indexOf(playerToEat);
+                    players.splice(index, 1);
+
+                    player.size += playerToEat.size / 2;
+                    socket.emit('updatedSize', player.size);
+                    socket.emit('gameOver', playerToEat);
+                    socket.broadcast.emit('gameOver', playerToEat);
+                }
+            }
+        }
+    });
+
     socket.on('disconnect', function () {
         console.log('disconnected', player ? player.name : 'new player');
-
-        // clearInterval(starsUpdateInterval);
-        // clearInterval(playerUpdateInterval);
 
         if (player && player.name) {
             const index = players.findIndex(p => p.name === player.name);
@@ -167,9 +159,10 @@ io.on('connection', function (socket) {
         let newUpdated = Math.floor((new Date()) / 1000);
         for (let player of players) {
             if (player.size > 50) {
-                player.size -= (newUpdated - lastUpdated) * (player.size / 100);
+                player.size -= (newUpdated - lastUpdated) * Math.pow((player.size / 100), 3);
             }
         }
+
         lastUpdated = newUpdated;
     }
 });

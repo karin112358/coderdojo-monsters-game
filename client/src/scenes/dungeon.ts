@@ -88,6 +88,14 @@ export class Dungeon extends Scene {
   private drawPlayer(p: p5, player: Player) {
     p.textAlign(p.CENTER, p.BOTTOM);
 
+    // check if other player is touched
+    for (let player of this.game.players) {
+      const dist = Math.sqrt(Math.pow(player.x - this.game.self.x, 2) + Math.pow(player.y - this.game.self.y, 2));
+      if (dist < this.game.self.size / 4) {
+        this.game.eatPlayer(player.name);
+      }
+    }
+
     p.text(player.name, player.x - this.offset.x, player.y + player.size / 2 - this.offset.y);
     p.image(
       this.game.monsters[player.monsterId],

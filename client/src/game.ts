@@ -28,6 +28,10 @@ export class Game {
 
     this.socket.on("error", (error: string) => {
       alert(error);
+
+      if (error == "Player not valid") {
+        this.restart();
+      }
     });
 
     this.socket.on("joinedGame", (game: any) => {
@@ -89,6 +93,30 @@ export class Game {
         }
       }
     });
+
+    this.socket.on("gameOver", (player: any) => {
+      if (this.players) {
+        console.log("game over", player, this.self.name)
+        if (player.name == this.self.name) {
+          this.socket.disconnect();
+          alert("GAME OVER");
+          this.socket.connect();
+          this.restart();
+        } else {
+          const index = this.players.findIndex(p => p.name === player.name);
+          if (index >= 0) {
+            this.players.splice(index, 1);
+          }
+        }
+      }
+    });
+
+    this.socket.on("connect_error", () => {
+      if (this.self) {
+        alert("Der Server ist nicht erreichbar.");
+        this.restart();
+      }
+    });
   }
 
   loadResources(p: p5) {
@@ -102,6 +130,8 @@ export class Game {
   }
 
   setup(p: p5) {
+    p.createCanvas(800, 800);
+
     this.p = p;
 
     this.changeScene(new Intro(this));
@@ -132,6 +162,10 @@ export class Game {
     this.socket.emit("eatStar", x, y);
   }
 
+  eatPlayer(name: string) {
+    this.socket.emit("eatPlayer", name);
+  }
+
   private async changeScene(scene: Scene) {
     if (this.activeScene) {
       this.activeScene.destroy(this.p);
@@ -141,5 +175,11 @@ export class Game {
     await this.activeScene.loadResources(this.p);
     this.activeScene.setup(this.p);
     this.activeScene.isInitialized = true;
+  }
+
+  private restart() {
+    this.players = null;
+    this.self = null;
+    this.setup(this.p);
   }
 }

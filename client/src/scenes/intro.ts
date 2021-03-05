@@ -10,7 +10,6 @@ export class Intro extends Scene {
   }
 
   setup(p: p5) {
-    p.createCanvas(800, 800);
   }
 
   draw(p: p5) {
