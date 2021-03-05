@@ -119,7 +119,7 @@ io.on('connection', function (socket) {
                 const dist = Math.sqrt(Math.pow(player.x - playerToEat.x, 2) + Math.pow(player.y - playerToEat.y, 2));
                 console.log(playerToEat, dist);
 
-                if (dist < player.size / 4) {
+                if (dist < player.size / 2) {
                     console.log('eat');
                     const index = players.indexOf(playerToEat);
                     players.splice(index, 1);

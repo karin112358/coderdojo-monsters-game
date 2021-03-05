@@ -91,7 +91,7 @@ export class Dungeon extends Scene {
     // check if other player is touched
     for (let player of this.game.players) {
       const dist = Math.sqrt(Math.pow(player.x - this.game.self.x, 2) + Math.pow(player.y - this.game.self.y, 2));
-      if (dist < this.game.self.size / 4) {
+      if (dist < this.game.self.size / 2) {
         this.game.eatPlayer(player.name);
       }
     }
